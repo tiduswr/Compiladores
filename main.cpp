@@ -1,5 +1,5 @@
 #include <iostream>
-#include "analisador-lexico.hpp"
+#include "libs/analisador-lexico.hpp"
 
 int main(int argc, char const *argv[]) {
     std::string source_code(argv[1]);

@@ -3,8 +3,8 @@ project(SampleCompiler CXX)
 
 add_executable(sample-compiler 
     main.cpp
-    analisador-lexico.cpp
-    token.cpp
+    libs/analisador-lexico.cpp
+    libs/token.cpp
 )
 
 set(CMAKE_CXX_STANDARD 17)
