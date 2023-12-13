@@ -17,10 +17,10 @@ char Lexer::lookAhead(){
     return source_code[current_position];
 }
 
-void Lexer::mkToken(const char& tk, TokenType t){
+void Lexer::mkToken(const std::string& tk, TokenType t){
     Token token;
     token.tipo = t;
-    token.valor = std::string(1, tk);
+    token.valor = tk;
     tokens.push_back(token);
 }
 
@@ -43,17 +43,9 @@ void Lexer::match(const char& token){
     }
 }
 
-void Lexer::digit(){
-    if(isdigit(lookAhead())){
-        mkToken(lookAhead(), INTEIRO); match(lookAhead());
-    }else{
-        throw TokenInvalidError(current_position);
-    }
-}
-
 void Lexer::paren_e(){
     if(lookAhead() == '('){
-        mkToken(lookAhead(), T_PAR_ESQ); match(lookAhead());
+        mkToken(std::string(1, lookAhead()), T_PAR_ESQ); match(lookAhead());
     }else{
         throw TokenInvalidError(current_position);
     }
@@ -61,7 +53,7 @@ void Lexer::paren_e(){
 
 void Lexer::paren_d(){
     if(lookAhead() == ')'){
-        mkToken(lookAhead(), T_PAR_DIR); match(lookAhead());
+        mkToken(std::string(1, lookAhead()), T_PAR_DIR); match(lookAhead());
     }else{
         throw TokenInvalidError(current_position);
     }
@@ -70,16 +62,16 @@ void Lexer::paren_d(){
 void Lexer::op(){
     switch (lookAhead()){
         case '+':
-            mkToken(lookAhead(), OP_MAIS); match(lookAhead());
+            mkToken(std::string(1, lookAhead()), OP_MAIS); match(lookAhead());
             break;
         case '-':
-            mkToken(lookAhead(), OP_MENOS); match(lookAhead());
+            mkToken(std::string(1, lookAhead()), OP_MENOS); match(lookAhead());
             break;
         case '*':
-            mkToken(lookAhead(), OP_MULT); match(lookAhead());
+            mkToken(std::string(1, lookAhead()), OP_MULT); match(lookAhead());
             break;
         case '/':
-            mkToken(lookAhead(), OP_DIV); match(lookAhead());
+            mkToken(std::string(1, lookAhead()), OP_DIV); match(lookAhead());
             break;
         default:
             throw TokenInvalidError(current_position);
@@ -121,12 +113,29 @@ void Lexer::term_tail(){
     }
 }
 
-void Lexer::factor(){
-    if(isdigit(lookAhead())){
+void Lexer::digit() {
+    std::string buffer = "";
+    while (isdigit(lookAhead())) {
+        buffer = buffer + std::string(1, lookAhead());
+        match(lookAhead());
+    }
+    mkToken(buffer, INTEIRO);
+}
+
+void Lexer::number() {
+    if (isdigit(lookAhead())) {
         digit();
-    }else if(lookAhead() == '('){
+    } else {
+        throw TokenInvalidError(current_position);
+    }
+}
+
+void Lexer::factor() {
+    if (isdigit(lookAhead())) {
+        number();
+    } else if (lookAhead() == '(') {
         paren_e(); expr(); paren_d();
-    }else{
+    } else {
         throw TokenInvalidError(current_position);
     }
 }

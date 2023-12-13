@@ -19,10 +19,11 @@ private:
     size_t source_size;
     const char* source_code;
 
-    void mkToken(const char& tk, TokenType t);
+    void mkToken(const std::string& tk, TokenType t);
     char lookAhead();
     void match(const char& token);
-    void digit();    
+    void digit();  
+    void number();  
     void op();
     void paren_e();
     void paren_d();
