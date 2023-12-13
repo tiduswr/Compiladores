@@ -68,8 +68,6 @@ void Lexer::paren_d(){
 }
 
 void Lexer::op(){
-    std::set<char> operators = {'+', '-', '*', '/'};
-
     switch (lookAhead()){
         case '+':
             mkToken(lookAhead(), OP_MAIS); match(lookAhead());
