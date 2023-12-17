@@ -1,6 +1,8 @@
 #include <stdexcept>
 #include "token.hpp"
 
+const Token NULL_TOKEN = {FIM, ""};
+
 std::string tokenTypeToString(TokenType type) {
     switch (type) {
         case INTEIRO: return "INTEIRO";
@@ -14,6 +16,14 @@ std::string tokenTypeToString(TokenType type) {
         case FIM: return "FIM";
         default: return "DESCONHECIDO";
     }
+}
+
+bool compareTokens(const Token& tk1, const Token& tk2){
+    return (tk1.valor == tk2.valor) && (tk1.tipo == tk2.tipo);
+}
+
+bool compareTokenValue(const Token& tk1, const std::string& value){
+    return tk1.valor == value;
 }
 
 TokenInvalidError::TokenInvalidError(const std::string& message, int index) : 

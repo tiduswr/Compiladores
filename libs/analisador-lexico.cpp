@@ -1,20 +1,64 @@
 #include <iostream>
 #include <vector>
-#include <set>
 #include <cctype>
-#include <algorithm>
+#include <queue>
 #include "token.hpp"
 #include "analisador-lexico.hpp"
 
-Lexer::Lexer(const std::string& source_code) {
-    this->source_code = source_code.c_str();
-    this->source_size = source_code.size();
-    current_position = 0;
-    expr();
+Lexer::Lexer(const std::string& src) : source_code(src) , tokenIndex(0), tokens() {
+
+    std::size_t current_position = 0;
+    std::queue<char> buffer;
+
+    for(const char currentChar : source_code){
+        if (isdigit(currentChar)) {
+            buffer.push(currentChar);
+        }else{
+
+            if (!buffer.empty()) {
+                mkToken(bufferToString(buffer), INTEIRO);
+                while (!buffer.empty()) {
+                    buffer.pop();
+                }
+            }
+
+            TokenType tokenType;
+            switch (currentChar) {
+                case '+':
+                    tokenType = OP_MAIS;
+                    break;
+                case '-':
+                    tokenType = OP_MENOS;
+                    break;
+                case '*':
+                    tokenType = OP_MULT;
+                    break;
+                case '/':
+                    tokenType = OP_DIV;
+                    break;
+                case '(':
+                    tokenType = T_PAR_ESQ;
+                    break;
+                case ')':
+                    tokenType = T_PAR_DIR;
+                    break;
+                default:
+                    throw TokenInvalidError(current_position);
+                    break;
+            }
+
+            mkToken(std::string(&currentChar, 1), tokenType);
+        }
+        current_position++;
+    }
+
+    if (!buffer.empty()) {
+        mkToken(bufferToString(buffer), INTEIRO);
+    }
 }
 
-char Lexer::lookAhead(){
-    return source_code[current_position];
+std::string Lexer::bufferToString(std::queue<char>& buffer){
+    return std::string(&buffer.front(), buffer.size());
 }
 
 void Lexer::mkToken(const std::string& tk, TokenType t){
@@ -35,107 +79,6 @@ Token Lexer::getNextToken() {
     }
 }
 
-void Lexer::match(const char& token){
-    if(lookAhead() == token && (current_position < source_size)){
-        current_position++;
-    }else{
-        throw TokenInvalidError(current_position);
-    }
-}
-
-void Lexer::paren_e(){
-    if(lookAhead() == '('){
-        mkToken(std::string(1, lookAhead()), T_PAR_ESQ); match(lookAhead());
-    }else{
-        throw TokenInvalidError(current_position);
-    }
-}
-
-void Lexer::paren_d(){
-    if(lookAhead() == ')'){
-        mkToken(std::string(1, lookAhead()), T_PAR_DIR); match(lookAhead());
-    }else{
-        throw TokenInvalidError(current_position);
-    }
-}
-
-void Lexer::op(){
-    switch (lookAhead()){
-        case '+':
-            mkToken(std::string(1, lookAhead()), OP_MAIS); match(lookAhead());
-            break;
-        case '-':
-            mkToken(std::string(1, lookAhead()), OP_MENOS); match(lookAhead());
-            break;
-        case '*':
-            mkToken(std::string(1, lookAhead()), OP_MULT); match(lookAhead());
-            break;
-        case '/':
-            mkToken(std::string(1, lookAhead()), OP_DIV); match(lookAhead());
-            break;
-        default:
-            throw TokenInvalidError(current_position);
-            break;
-    }
-}
-
-void Lexer::expr(){
-    term(); expr_tail();
-}
-
-void Lexer::expr_tail(){
-    switch (lookAhead()){
-        case '+':
-            op(); term(); expr_tail();
-            break;
-        case '-':
-            op(); term(); expr_tail();
-            break;
-        default:
-            break;
-    }
-}
-
-void Lexer::term(){
-    factor(); term_tail();
-}
-
-void Lexer::term_tail(){
-    switch (lookAhead()){
-        case '*':
-            op(); factor(); term_tail();
-            break;
-        case '/':
-            op(); factor(); term_tail();
-            break;
-        default:
-            break;
-    }
-}
-
-void Lexer::digit() {
-    std::string buffer = "";
-    while (isdigit(lookAhead())) {
-        buffer = buffer + std::string(1, lookAhead());
-        match(lookAhead());
-    }
-    mkToken(buffer, INTEIRO);
-}
-
-void Lexer::number() {
-    if (isdigit(lookAhead())) {
-        digit();
-    } else {
-        throw TokenInvalidError(current_position);
-    }
-}
-
-void Lexer::factor() {
-    if (isdigit(lookAhead())) {
-        number();
-    } else if (lookAhead() == '(') {
-        paren_e(); expr(); paren_d();
-    } else {
-        throw TokenInvalidError(current_position);
-    }
+std::vector<Token>* Lexer::getTokens(){
+    return &tokens;
 }

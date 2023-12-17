@@ -1,15 +1,24 @@
 #include <iostream>
-#include "libs/analisador-lexico.hpp"
+#include "libs/analisador-sintatico.hpp"
+#include "libs/token.hpp"
 
 int main(int argc, char const *argv[]) {
-    std::string source_code(argv[1]);
+    
+    std::string input;
 
-    Lexer lex = Lexer(source_code);
+    if(argc <=1 || (argc > 1 && (argv[1][0] == '\0'))){
+        //Valor teste
+        input = "(3+22)*12";
+    }else{
+        input = argv[1];
+    }
 
-    Token t = lex.getNextToken();
+    Parser parser = Parser(input);
+
+    Token t = parser.lexer.getNextToken();
     while(t.tipo != FIM){
         std::cout << "Tipo: " + tokenTypeToString(t.tipo) + ", Valor: " + t.valor << std::endl;
-        t = lex.getNextToken();
+        t = parser.lexer.getNextToken();
     }
 
     return 0;

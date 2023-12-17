@@ -3,6 +3,7 @@ project(SampleCompiler CXX)
 
 add_executable(sample-compiler 
     main.cpp
+    libs/analisador-sintatico.cpp
     libs/analisador-lexico.cpp
     libs/token.cpp
 )

@@ -12,15 +12,22 @@ enum TokenType {
     T_PAR_ESQ,
     T_PAR_DIR,
     T_ESPACO,
-    FIM
+    FIM,
+    VAZIO
 };
-
-std::string tokenTypeToString(TokenType type);
 
 struct Token {
     TokenType tipo;
     std::string valor;
 };
+
+extern const Token NULL_TOKEN;
+
+std::string tokenTypeToString(TokenType type);
+
+bool compareTokens(const Token& tk1, const Token& tk2);
+
+bool compareTokenValue(const Token& tk1, const std::string& value);
 
 class TokenInvalidError : public std::runtime_error {
 public:
