@@ -11,6 +11,7 @@ Lexer::Lexer(const std::string& src) : source_code(src) , tokenIndex(0), tokens(
     std::queue<char> buffer;
 
     for(const char currentChar : source_code){
+        
         if (isdigit(currentChar)) {
             buffer.push(currentChar);
         }else{
